@@ -1,6 +1,6 @@
-import logging
-
 import aiomysql
+import logging
+logging.basicConfig(level=logging.INFO)
 
 
 def log(sql, args=()):
@@ -81,7 +81,7 @@ class StringField(Field):
     def __init__(self, name=None, primary_key=False, default=None,
                  ddl='varchar(100)'):
         super().__init__(name, ddl, primary_key, default)
- 
+
 
 class BooleanField(Field):
 
@@ -124,7 +124,8 @@ class ModelMetaclass(type):
                 if v.primary_key:
                     # 找到主键:
                     if primary_key:
-                        raise Exception('Duplicate primary key for field: %s' % k)
+                        raise Exception(
+                            'Duplicate primary key for field: %s' % k)
                     primary_key = k
                 else:
                     fields.append(k)
@@ -137,14 +138,16 @@ class ModelMetaclass(type):
         attrs['__table__'] = table_name
         attrs['__primary_key__'] = primary_key  # 主键属性名
         attrs['__fields__'] = fields  # 除主键外的属性名
-        attrs['__select__'] = 'select `%s`, %s from `%s`' % (primary_key, ', '.join(escaped_fields), table_name)
+        attrs['__select__'] = 'select `%s`, %s from `%s`' % (
+            primary_key, ', '.join(escaped_fields), table_name)
         attrs['__insert__'] = 'insert into `%s` (%s, `%s`) values (%s)' % (table_name, ', '.join(escaped_fields),
                                                                            primary_key,
                                                                            create_args_string(len(escaped_fields) + 1))
         attrs['__update__'] = 'update `%s` set %s where `%s`=?' %\
-                              (table_name, ', '.join(map(lambda f: '`%s`=?'% (mappings.get(f).name or f), fields)),
+                              (table_name, ', '.join(map(lambda f: '`%s`=?' % (mappings.get(f).name or f), fields)),
                                primary_key)
-        attrs['__delete__'] = 'delete from `%s` where `%s`=?' % (table_name, primary_key)
+        attrs['__delete__'] = 'delete from `%s` where `%s`=?' % (
+            table_name, primary_key)
         return type.__new__(mcs, name, bases, attrs)
 
 
@@ -171,7 +174,8 @@ class Model(dict, metaclass=ModelMetaclass):
             field = self.__mappings__[key]
             if field.default is not None:
                 value = field.default() if callable(field.default) else field.default
-                logging.debug("using default value for %s: %s" % (key, str(value)))
+                logging.debug("using default value for %s: %s" %
+                              (key, str(value)))
                 setattr(self, key, value)
         return value
 
@@ -227,18 +231,20 @@ class Model(dict, metaclass=ModelMetaclass):
         args.append(self.get_value_or_default(self.__primary_key__))
         rows = await execute(self.__insert__, args)
         if rows != 1:
-            logging.warning('failed to insert record: affected rows: %s' % rows)
+            logging.warning(
+                'failed to insert record: affected rows: %s' % rows)
 
     async def update(self):
         args = list(map(self.get_value, self.__fields__))
         args.append(self.get_value(self.__primary_key__))
         rows = await execute(self.__update__, args)
         if rows != 1:
-            logging.warning('failed to update by primary key: affected rows: %s' % rows)
+            logging.warning(
+                'failed to update by primary key: affected rows: %s' % rows)
 
     async def remove(self):
         args = [self.getValue(self.__primary_key__)]
         rows = await execute(self.__delete__, args)
         if rows != 1:
-            logging.warning('failed to remove by primary key: affected rows: %s' % rows)
-
+            logging.warning(
+                'failed to remove by primary key: affected rows: %s' % rows)

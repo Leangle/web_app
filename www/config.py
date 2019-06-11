@@ -7,10 +7,12 @@ Created on 2019/5/19
 """
 import config_default
 
+
 class Dict(dict):
     """
     Simple dict but support accesss as x.y style.
     """
+
     def __init(self, names=(), values=(), **kwargs):
         super().__init__(**kwargs)
         for key, value in zip(names, values):

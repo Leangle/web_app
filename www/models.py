@@ -5,12 +5,13 @@ Created on 2019/5/6
 
 @author: Lawrence
 """
-import time, uuid
+import time
+import uuid
 from orm import Model, StringField, BooleanField,  FloatField, TextField
 
 
 def next_id():
-    return '%015d%s000'%(int(time.time() * 1000), uuid.uuid4().hex)
+    return '%015d%s000' % (int(time.time() * 1000), uuid.uuid4().hex)
 
 
 class User(Model):
@@ -48,6 +49,3 @@ class Comment(Model):
     user_image = StringField(ddl='varchar(50)')
     content = TextField()
     created_at = FloatField(default=time.time)
-
-
-
