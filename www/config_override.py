@@ -7,6 +7,6 @@ Created on 2019/5/19
 """
 configs = {
     'db': {
-        'host': '192.168.175.1'
+        'host': 'localhost'
     }
 }

@@ -7,7 +7,6 @@ Created on 2019/5/19
 """
 import config_default
 
-
 class Dict(dict):
     """
     Simple dict but support accesss as x.y style.
@@ -41,7 +40,7 @@ def merge(defaults, overrides):
 
 
 def to_dict(d):
-    ret_dict = {}
+    ret_dict = Dict()
     for key, value in d.items():
         ret_dict[key] = to_dict(value) if isinstance(value, dict) else value
     return ret_dict
@@ -53,3 +52,5 @@ try:
     configs = merge(configs, config_override.configs)
 except ImportError:
     pass
+
+configs = to_dict(configs)

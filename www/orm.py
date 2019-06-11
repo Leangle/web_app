@@ -8,14 +8,14 @@ def log(sql, args=()):
 
 
 async def create_pool(loop, **kw):
-    logging.info('create database connection poll...')
+    logging.info('create database connection pool...')
     global __pool
     __pool = await aiomysql.create_pool(
         host=kw.get('host', 'localhost'),
         port=kw.get('port', 3306),
         user=kw['user'],
         password=kw['password'],
-        db=kw['db'],
+        db=kw['database'],
         charset=kw.get('charset', 'utf8'),
         autocommit=kw.get('autocommit', True),
         maxsize=kw.get('maxsize', 10),
@@ -41,7 +41,7 @@ async def select(sql, args, size=None):
 async def execute(sql, args, autocommit=True):
     log(sql, args)
     global __pool
-    async with await __pool.get() as conn:
+    async with __pool.get() as conn:
         if not autocommit:
             await conn.begin()
         try:
@@ -78,9 +78,10 @@ class Field(object):
 
 class StringField(Field):
 
-    def __init__(self, name=None, primary_key=False, default=None, ddl='varchar(100)'):
+    def __init__(self, name=None, primary_key=False, default=None,
+                 ddl='varchar(100)'):
         super().__init__(name, ddl, primary_key, default)
-    
+ 
 
 class BooleanField(Field):
 
@@ -165,11 +166,11 @@ class Model(dict, metaclass=ModelMetaclass):
         return getattr(self, key, None)
 
     def get_value_or_default(self, key):
-        value = getattr(slef, key, None)
+        value = getattr(self, key, None)
         if value is None:
             field = self.__mappings__[key]
             if field.default is not None:
-                value = field.default() if callable(filed.default) else field.default
+                value = field.default() if callable(field.default) else field.default
                 logging.debug("using default value for %s: %s" % (key, str(value)))
                 setattr(self, key, value)
         return value

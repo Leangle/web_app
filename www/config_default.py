@@ -6,13 +6,15 @@ Created on 2019/5/19
 @author: Lawrence
 """
 configs = {
+    "debug": True,
     "db": {
-        'host': '192.168.175.1',
-        'port': 3360,
+        'host': 'localhost',
+        'port': 3306,
         'user': 'www-data',
         'database': 'awesome',
+        "password": '123456'
     },
     'session': {
-        'secret': '123456'
+        'secret': 'Awesome'
     }
 }
