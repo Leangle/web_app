@@ -140,7 +140,8 @@ class RequestHandler(object):
             # check named arg:
             for k, v in request.match_info.items():
                 if k in kw:
-                    logging.warning('Duplicate arg name in named arg and kw args: %s' % k)
+                    logging.warning(
+                        'Duplicate arg name in named arg and kw args: %s' % k)
                 kw[k] = v
         if self._has_request_arg:
             kw['request'] = request
@@ -170,7 +171,8 @@ def add_route(app, fn):
         raise ValueError('@get or @post not defined in %s.' % str(fn))
     if not asyncio.iscoroutinefunction(fn) and not inspect.isgeneratorfunction(fn):
         fn = asyncio.coroutine(fn)
-    logging.info('add route %s %s => %s(%s)' % (method, path, fn.__name__, ', '.join(inspect.signature(fn).parameters.keys())))
+    logging.info('add route %s %s => %s(%s)' % (
+        method, path, fn.__name__, ', '.join(inspect.signature(fn).parameters.keys())))
     app.router.add_route(method, path, RequestHandler(app, fn))
 
 
@@ -180,7 +182,8 @@ def add_routes(app, module_name):
         mod = __import__(module_name, globals(), locals())
     else:
         name = module_name[n+1:]
-        mod = getattr(__import__(module_name[:n], globals(), locals(), [name]), name)
+        mod = getattr(__import__(
+            module_name[:n], globals(), locals(), [name]), name)
     for attr in dir(mod):
         if attr.startswith('_'):
             continue
